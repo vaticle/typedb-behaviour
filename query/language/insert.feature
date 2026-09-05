@@ -2783,7 +2783,7 @@ Parker";
     match
       friendship ($p, $q);
       $p isa person; try { $p has age $age; };
-    insert try { isset $age; $q has $age; };
+    insert if { isset $age; } { $q has $age; };
     """
     Then uniquely identify answer concepts
       | p             | q             |
@@ -2811,7 +2811,7 @@ Parker";
       $p isa person;
       try { $q isa person, has email $_; not { $q is $p; }; };
     insert
-      try { isset $q; $f isa friendship, links (friend: $p, friend: $q), has ref 0; };
+      if { isset $q; } { $f isa friendship, links (friend: $p, friend: $q), has ref 0; };
     """
     Then uniquely identify answer concepts
       | p         | q         | f         |
@@ -2840,7 +2840,7 @@ Parker";
       $p isa person;
       try { $p has age $age; };
       try { $p has name $name; };
-    insert try { isset $age, $name; $q isa person, has ref 0; $q has $age, has $name; };
+    insert if { isset $age, $name; } { $q isa person, has ref 0; $q has $age, has $name; };
     """
     Then uniquely identify answer concepts
       | p         | q         | age         | name           |

@@ -2845,7 +2845,7 @@ Feature: TypeQL Delete Query
     When get answers of typeql write query
     """
     match $p isa person, has name $name; try { $p has email $email; };
-    delete try { isset $email; $email; };
+    delete if { isset $email; } { $email; };
     """
     Then uniquely identify answer concepts
       | p             | name           |
@@ -2870,7 +2870,7 @@ Feature: TypeQL Delete Query
     When get answers of typeql write query
     """
     match $p isa person, has name $name; try { $p has email $email; };
-    delete try { isset $email; has $email of $p; };
+    delete if { isset $email; } { has $email of $p; };
     """
     Then uniquely identify answer concepts
       | p             | name           | email                   |
@@ -2900,7 +2900,7 @@ Feature: TypeQL Delete Query
       $p isa person;
       try { $p has email $email; };
       try { $p has age $age; };
-    delete try { isset $email, $age;  has $email of $p; has $age of $p; };
+    delete if { isset $email, $age; } {  has $email of $p; has $age of $p; };
     """
     Then uniquely identify answer concepts
       | p              | email                   | age         |
@@ -2938,7 +2938,7 @@ Feature: TypeQL Delete Query
     When get answers of typeql write query
     """
     match $p isa person, has name $name; try { $f isa friendship, links ($p); };
-    delete try { isset $f; $f; };
+    delete if { isset $f; } { $f; };
     """
     Then uniquely identify answer concepts
       | p             | name           |
@@ -2966,7 +2966,7 @@ Feature: TypeQL Delete Query
     When get answers of typeql write query
     """
     match $p isa person, has name $name; try { $f isa friendship, links ($p); };
-    delete try { isset $f; links ($p) of $f; };
+    delete if { isset $f; } { links ($p) of $f; };
     """
     Then uniquely identify answer concepts
       | p             | name           | f         |

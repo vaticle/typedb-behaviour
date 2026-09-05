@@ -1052,7 +1052,7 @@ Feature: Driver Query
     """
     given $p: person, $age_value: integer?;
     match $p isa person, has name $name;
-    insert try { isset $age_value; $p has age == $age_value; };
+    insert if { isset $age_value; } { $p has age == $age_value; };
     """
     # We don't necessarily guarantee that the rows retain the order
     Then answer get row(0) get concepts size is: 3
@@ -1115,7 +1115,7 @@ Feature: Driver Query
     """
     given $p: person, $age_value: integer?;
     match $p isa person, has name $name;
-    insert try { isset $age_value; $p has age == $age_value; };
+    insert if { isset $age_value; } { $p has age == $age_value; };
     """
     # We don't necessarily guarantee that the rows retain the order
     Then answer get row(0) get entity(p) get type get label: person
@@ -1133,7 +1133,7 @@ Feature: Driver Query
     """
     given $p: person, $age_value: integer?;
     match $p isa person, has name $name;
-    insert try { isset $age_value; $p has age == $age_value; };
+    insert if { isset $age_value; } { $p has age == $age_value; };
     """
     # We don't necessarily guarantee that the rows retain the order
     Then answer get row(0) get entity(p) get type get label: person
@@ -1224,7 +1224,7 @@ Feature: Driver Query
     """
     given $p: person, $age_value: integer?;
     match $p isa person, has name $name;
-    insert try { isset $age_value; $p has age == $age_value; };
+    insert if { isset $age_value; } { $p has age == $age_value; };
     """
     # We don't necessarily guarantee that the rows retain the order
     Then answer get row(0) get entity(p) get type get label: person
