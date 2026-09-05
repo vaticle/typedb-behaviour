@@ -375,7 +375,7 @@ Feature: TypeQL Variable binding tests
 
 
   # TODO: Do we even want to allow this behaviour?
-  Scenario: Referencing optional variables in a write stage without an unwrap fails
+  Scenario: Referencing optional variables in a write stage outside an if fails
     Given connection open write transaction for database: typedb
     When typeql write query; fails with a message containing: "The optional variable 'x' was used in a context where it may fail the branch if unset. Please acknowledge the optionality"
     """
@@ -390,8 +390,9 @@ Feature: TypeQL Variable binding tests
     match
       try { $x isa person; };
     insert
-      isset $x;
-      $x has name "Steve";
+      if { isset $x; } {
+        $x has name "Steve";
+      };
     """
     Then answer size is: 1
     Given transaction closes
@@ -410,8 +411,9 @@ Feature: TypeQL Variable binding tests
     match
       try { $x isa person; };
     put
-      isset $x;
-      $x has name "Steve";
+      if { isset $x; } {
+        $x has name "Steve";
+      };
     """
     Then answer size is: 1
     Given transaction closes
@@ -422,7 +424,9 @@ Feature: TypeQL Variable binding tests
     match
       try { $x isa person; };
     update
-      $x has ref 54321;
+      if { isset $x; } {
+        $x has ref 54321;
+      };
     """
     Given connection open write transaction for database: typedb
     When get answers of typeql write query
@@ -430,8 +434,9 @@ Feature: TypeQL Variable binding tests
     match
       try { $x isa person; };
     update
-      isset $x;
-      $x has ref 54321;
+      if { isset $x; } {
+        $x has ref 54321;
+      };
     """
     Then answer size is: 1
     Given transaction closes
@@ -450,8 +455,9 @@ Feature: TypeQL Variable binding tests
     match
       try { $x isa person; };
     delete
-      isset $x;
-      $x;
+      if { isset $x; } {
+        $x;
+      };
     """
     Then answer size is: 1
     Given transaction closes
