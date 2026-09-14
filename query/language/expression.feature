@@ -217,10 +217,8 @@ Feature: TypeQL Query with Expressions
     Given transaction closes
 
     # Non-cyclic query, just inverted dependencies in two branches.
-    # TODO: This is legal, but currently fails because our validation is too coarse.
-    # The validation introduced in #7900 is finer and permits this.
     Given connection open read transaction for database: typedb
-    Then typeql read query; fails with a message containing: "illegal circular expression assignment & usage"
+    When get answers of typeql read query
     """
       match
         { let $x = 5; let $y = $x; } or
@@ -228,7 +226,7 @@ Feature: TypeQL Query with Expressions
       select
         $x, $y;
       """
-    #Then verify answer size is: 2
+    Then answer size is: 2
     Given transaction closes
 
 

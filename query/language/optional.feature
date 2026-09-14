@@ -223,6 +223,7 @@ Feature: TypeQL Optional
       $p isa person;
       try { $c isa company; $r isa employment ($p, $c); };
       match
+      isset $c;
       $p has name $name;
       $c has name $company_name;
       """
@@ -238,7 +239,7 @@ Feature: TypeQL Optional
       try { $c isa company; $r isa employment ($p, $c); };
       match
       $p has name $name;
-      { $c has name $attr; $attr == "Uber"; } or { $c has ref $attr; $attr == 32; };
+      { isset $c; $c has name $attr; $attr == "Uber"; } or { isset $c; $c has ref $attr; $attr == 32; };
       """
     Then uniquely identify answer concepts
       | p          | c          | r          | name            | attr           |
@@ -253,7 +254,7 @@ Feature: TypeQL Optional
       try { $c isa company; $r isa employment ($p, $c); };
       match
       $p has name $name;
-      { $c has name $attr; $attr == "Uber"; } or { $p has ref 30; } or { $p has ref 31; };
+      { isset $c; $c has name $attr; $attr == "Uber"; } or { $p has ref 30; } or { $p has ref 31; };
       """
     Then uniquely identify answer concepts
       | p          | c          | r          | name               |
@@ -268,7 +269,7 @@ Feature: TypeQL Optional
       try { $c isa company; $r isa employment ($p, $c); };
       match
       $p has name $name;
-      not { $c has ref 100000; };
+      not { isset $c; $c has ref 100000; };
       """
     Then uniquely identify answer concepts
       | p          | c          | r          | name               |
@@ -295,7 +296,7 @@ Feature: TypeQL Optional
       try { $c isa company; $r isa employment ($p, $c); };
       match
       $p has name $name;
-      try { $c has name $company_name; };
+      try { isset $c; $c has name $company_name; };
       """
     Then uniquely identify answer concepts
       | p          | c          | r          | name               | company_name   |
@@ -310,7 +311,7 @@ Feature: TypeQL Optional
       match
       try {
         $p has name $name;
-        try { $c has name $company_name; };
+        try { isset $c; $c has name $company_name; };
       };
       """
     Then uniquely identify answer concepts

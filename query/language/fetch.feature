@@ -887,7 +887,7 @@ Feature: TypeQL Fetch Query
           try { employment (employee: $p, employer: $e); };
           fetch {
             "person": { $p.* },
-            "employer": { $e.* }
+            "employer": { $e.* }  # TODO: What do we do here if $e is optional?
           };
       """
     Then answer size is: 2
@@ -926,7 +926,7 @@ Feature: TypeQL Fetch Query
           try { employment (employee: $p, employer: $e); };
           fetch {
             "person": { $p.* },
-            "employer": [ match $e has company-name $name; return { $name }; ]
+            "employer": [ match $e has company-name $name; return { $name }; ]  # TODO: What do we do here if $e is optional?
           };
       """
     Then answer size is: 2
@@ -962,7 +962,7 @@ Feature: TypeQL Fetch Query
           try { $p has karma $k; };
           fetch {
             "name": [ $p.person-name ],
-            "adjusted-karma": $k - 100.0
+            "adjusted-karma": $k - 100.0 # TODO: What do we do here if $k is optional?
           };
       """
     Then answer size is: 2

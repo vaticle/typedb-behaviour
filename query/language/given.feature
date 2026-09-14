@@ -230,7 +230,7 @@ Feature: TypeQL Given Clause
       given $x: integer, $y: integer?;
       match
        let $p = $x * 2;
-       try { let $q = $x + $y; };
+       try { isset $y; let $q = $x + $y; };
       """
     Then uniquely identify answer concepts
       | x               | p                |
@@ -255,7 +255,7 @@ Feature: TypeQL Given Clause
       given $x: integer, $y: integer?;
       match
         let $p = $x;
-       try { let $q = $x + $y; };
+       try { isset $y; let $q = $x + $y; };
       """
 
 
@@ -369,7 +369,7 @@ Feature: TypeQL Given Clause
       | ref               | name               |
       | value:integer:110 | value:string:James |
       | value:integer:111 | none               |
-    Then typeql write query with given rows; fails with a message containing: "A write stage uses the optional variable 'name' outside a 'try' block"
+    Then typeql write query with given rows; fails with a message containing: "The optional variable 'name' was used in a context where it may fail the branch if unset. Please acknowledge the optionality"
         """
         given $ref: integer, $name: string?;
         insert $p isa person, has ref == $ref, has name == $name;
@@ -386,7 +386,7 @@ Feature: TypeQL Given Clause
         given $ref: integer, $name: string?;
         insert
           $p isa person, has ref == $ref;
-          try { $p has name == $name; };
+          try { isset $name; $p has name == $name; };
         """
     Then transaction commits
 
@@ -417,7 +417,7 @@ Feature: TypeQL Given Clause
         given $ref: integer, $name: string?;
         insert
           $p isa person, has ref == $ref;
-          try { $p has name == $name; };
+          try { isset $name; $p has name == $name; };
         """
     Given set query given rows
       | ref               |
@@ -427,7 +427,7 @@ Feature: TypeQL Given Clause
         given $ref: integer, $name: string?;
         insert
           $p isa person, has ref == $ref;
-          try { $p has name == $name; };
+          try { isset $name; $p has name == $name; };
         """
 
     Then transaction commits

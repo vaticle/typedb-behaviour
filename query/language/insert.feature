@@ -2783,7 +2783,7 @@ Parker";
     match
       friendship ($p, $q);
       $p isa person; try { $p has age $age; };
-    insert try { $q has $age; };
+    insert if { isset $age; } { $q has $age; };
     """
     Then uniquely identify answer concepts
       | p             | q             |
@@ -2811,7 +2811,7 @@ Parker";
       $p isa person;
       try { $q isa person, has email $_; not { $q is $p; }; };
     insert
-      try { $f isa friendship, links (friend: $p, friend: $q), has ref 0; };
+      if { isset $q; } { $f isa friendship, links (friend: $p, friend: $q), has ref 0; };
     """
     Then uniquely identify answer concepts
       | p         | q         | f         |
@@ -2840,7 +2840,7 @@ Parker";
       $p isa person;
       try { $p has age $age; };
       try { $p has name $name; };
-    insert try { $q isa person, has ref 0; $q has $age, has $name; };
+    insert if { isset $age, $name; } { $q isa person, has ref 0; $q has $age, has $name; };
     """
     Then uniquely identify answer concepts
       | p         | q         | age         | name           |
@@ -2862,7 +2862,7 @@ Parker";
     insert
       $john isa person, has ref 0, has name "John";
     """
-    Then typeql write query; fails with a message containing: "A write stage uses the optional variable 'age' outside a 'try' block."
+    Then typeql write query; fails with a message containing: "The optional variable 'age' was used in a context where it may fail the branch if unset. Please acknowledge the optionality"
     """
     match
       $p isa person;
@@ -2897,3 +2897,59 @@ Parker";
     Then uniquely identify answer concepts
       | p             | age         |
       | key:name:John | attr:age:32 |
+
+
+  Scenario: Write conditions can be isset, comparisons, isa or a conjunction of these.
+    When get answers of typeql write query
+    """
+    insert
+     $p isa person, has age 38, has ref 0;
+    """
+    Then transaction commits
+
+    Given connection open write transaction for database: typedb
+    When typeql write query
+    """
+    match $p isa person; try { $p has age $age; };
+    insert
+      if { isset $age; } {
+        $p has name "Sam";
+      };
+    """
+    Then transaction commits
+
+    Given connection open write transaction for database: typedb
+    Then typeql write query; fails with a message containing: "The language feature is not yet implemented"
+    """
+    match $p isa person, has age $age;
+    insert
+      if { $age < 35; } {
+        $p has name "Little Sam";
+      };
+      if { $age >= 35; } {
+        $p has name "Big Sam";
+      };
+    """
+
+    Given connection open write transaction for database: typedb
+    Then typeql write query; fails with a message containing: "The language feature is not yet implemented"
+    """
+    match $p has ref $_;
+    insert
+      if { $p isa person; } {
+        $p has name "Person Sam";
+      };
+      if { $p isa company; } {
+        $p has name "Company Sam";
+      };
+    """
+    Given connection open read transaction for database: typedb
+    When get answers of typeql read query
+    """
+    match $p has name $name;
+    """
+    Then uniquely identify answer concepts
+      | p         | name                 |
+      | key:ref:0 | attr:name:Sam        |
+      # | key:ref:0 | attr:name:Big Sam    | # For when we do support comparisons
+      # | key:ref:0 | attr:name:Person Sam | # For when we do support isa
