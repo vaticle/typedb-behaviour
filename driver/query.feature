@@ -1052,7 +1052,7 @@ Feature: Driver Query
     """
     given $p: person, $age_value: integer?;
     match $p isa person, has name $name;
-    insert try { $p has age == $age_value; };
+    insert try { isset $age_value; $p has age == $age_value; };
     """
     # We don't necessarily guarantee that the rows retain the order
     Then answer get row(0) get concepts size is: 3
@@ -1115,7 +1115,7 @@ Feature: Driver Query
     """
     given $p: person, $age_value: integer?;
     match $p isa person, has name $name;
-    insert try { $p has age == $age_value; };
+    insert try { isset $age_value; $p has age == $age_value; };
     """
     # We don't necessarily guarantee that the rows retain the order
     Then answer get row(0) get entity(p) get type get label: person
@@ -1133,7 +1133,7 @@ Feature: Driver Query
     """
     given $p: person, $age_value: integer?;
     match $p isa person, has name $name;
-    insert try { $p has age == $age_value; };
+    insert try { isset $age_value; $p has age == $age_value; };
     """
     # We don't necessarily guarantee that the rows retain the order
     Then answer get row(0) get entity(p) get type get label: person
@@ -1154,7 +1154,7 @@ Feature: Driver Query
       given $x: integer, $y: integer?;
       match
        let $p = $x * 2;
-       try { let $q = $x + $y; };
+       try { isset $y; let $q = $x + $y; };
       """
 
     Then answer get row(0) get value(x) get is: 5
@@ -1183,7 +1183,7 @@ Feature: Driver Query
       given $x: integer, $y: integer?;
       match
         let $p = $x;
-       try { let $q = $x + $y; };
+       try { isset $y; let $q = $x + $y; };
       """
 
 
@@ -1224,7 +1224,7 @@ Feature: Driver Query
     """
     given $p: person, $age_value: integer?;
     match $p isa person, has name $name;
-    insert try { $p has age == $age_value; };
+    insert try { isset $age_value; $p has age == $age_value; };
     """
     # We don't necessarily guarantee that the rows retain the order
     Then answer get row(0) get entity(p) get type get label: person
@@ -1259,7 +1259,7 @@ Feature: Driver Query
       given $x: integer, $y: integer?;
       match
        let $p = $x * 2;
-       try { let $q = $x + $y; };
+       try { isset $y; let $q = $x + $y; };
       """
     Then answer get row(0) get value(x) get is: 5
     Then answer get row(0) get value(p) get is: 10

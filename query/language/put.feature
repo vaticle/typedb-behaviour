@@ -648,7 +648,7 @@ Feature: TypeQL Put Query
     """
     match
       $p isa person, has ref $ref; try { $p has age $age; };
-    put $q isa also-person, has $ref; try { $q has $age; };
+    put $q isa also-person, has $ref; try { isset $age; $q has $age; };
     """
     Then uniquely identify answer concepts
       | p         | q         | age         |
@@ -691,7 +691,7 @@ Feature: TypeQL Put Query
       $p isa person;
       try { $q isa person, has email $_; not { $q is $p; }; };
     put
-      try { $f isa friendship, links (friend: $p, friend: $q), has ref 0; };
+      try { isset $q; $f isa friendship, links (friend: $p, friend: $q), has ref 0; };
     """
     Then uniquely identify answer concepts
       | p         | q         | f    |
@@ -704,7 +704,7 @@ Feature: TypeQL Put Query
       try { $q isa person, has email $_; not { $q is $p; }; };
     put
       $f isa friendship, links(friend: $p), has $ref;
-      try { $f links (friend: $q); };
+      try { isset $q; $f links (friend: $q); };
     """
     Then uniquely identify answer concepts
       | p         | q         | f         |
@@ -722,7 +722,7 @@ Feature: TypeQL Put Query
 
   Scenario: In a put stage, using an optional variable outside a try block errors.
     Given connection open write transaction for database: typedb
-    Then typeql write query; fails with a message containing: "A write stage uses the optional variable 'age' outside a 'try' block."
+    Then typeql write query; fails with a message containing: "The optional variable 'age' was used in a context where it may fail the branch if unset. Please acknowledge the optionality"
     """
     match
       $p isa person;
@@ -737,5 +737,5 @@ Feature: TypeQL Put Query
     Given typeql write query; fails
     """
     match $p isa person; try { $p has name $name, has age $age; };
-    put $q isa person; try { $q has $name; try { $q has $age; }; };
+    put $q isa person; try { isset $name; $q has $name; try { isset $age; $q has $age; }; };
     """

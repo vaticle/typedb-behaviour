@@ -880,7 +880,7 @@ Feature: TypeQL Fetch Query
 
 
   Scenario: fetch can handle optional objects
-    Then get answers of typeql read query
+    Then typeql read query; fails with a message containing: "The optional variable 'e' was used unsafely in a fetch statement"
       """
         match
           $p isa person;
@@ -888,6 +888,17 @@ Feature: TypeQL Fetch Query
           fetch {
             "person": { $p.* },
             "employer": { $e.* }
+          };
+      """
+
+    Then get answers of typeql read query
+      """
+        match
+          $p isa person;
+          try { employment (employee: $p, employer: $e); };
+          fetch {
+            "person": { $p.* },
+            "employer": { $e?.* }
           };
       """
     Then answer size is: 2
@@ -919,6 +930,21 @@ Feature: TypeQL Fetch Query
       }
       """
 
+    Then typeql read query; fails with a message containing: "The optional variable 'e' was used in a context where it may fail the branch if unset"
+      """
+        match
+          $p isa person;
+          try { employment (employee: $p, employer: $e); };
+          fetch {
+            "person": { $p.* },
+            "employer": [
+              match
+                $e has company-name $name;
+                return { $name };
+              ]
+          };
+      """
+
     Then get answers of typeql read query
       """
         match
@@ -926,7 +952,12 @@ Feature: TypeQL Fetch Query
           try { employment (employee: $p, employer: $e); };
           fetch {
             "person": { $p.* },
-            "employer": [ match $e has company-name $name; return { $name }; ]
+            "employer": [
+              match
+                isset $e;
+                $e has company-name $name;
+                return { $name };
+              ]
           };
       """
     Then answer size is: 2
@@ -955,7 +986,7 @@ Feature: TypeQL Fetch Query
 
 
   Scenario: fetch can handle optional objects
-    Then get answers of typeql read query
+    Then typeql read query; fails with a message containing: "The optional variable 'k' was used in a context where it may fail the branch if unset"
       """
         match
           $p isa person;
@@ -963,6 +994,17 @@ Feature: TypeQL Fetch Query
           fetch {
             "name": [ $p.person-name ],
             "adjusted-karma": $k - 100.0
+          };
+      """
+
+    Then get answers of typeql read query
+      """
+        match
+          $p isa person;
+          try { $p has karma $k; };
+          fetch {
+            "name": [ $p.person-name ],
+            "adjusted-karma": $k? - 100.0
           };
       """
     Then answer size is: 2

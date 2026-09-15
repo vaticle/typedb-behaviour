@@ -2783,7 +2783,7 @@ Parker";
     match
       friendship ($p, $q);
       $p isa person; try { $p has age $age; };
-    insert try { $q has $age; };
+    insert try { isset $age; $q has $age; };
     """
     Then uniquely identify answer concepts
       | p             | q             |
@@ -2811,7 +2811,7 @@ Parker";
       $p isa person;
       try { $q isa person, has email $_; not { $q is $p; }; };
     insert
-      try { $f isa friendship, links (friend: $p, friend: $q), has ref 0; };
+      try { isset $q; $f isa friendship, links (friend: $p, friend: $q), has ref 0; };
     """
     Then uniquely identify answer concepts
       | p         | q         | f         |
@@ -2840,7 +2840,7 @@ Parker";
       $p isa person;
       try { $p has age $age; };
       try { $p has name $name; };
-    insert try { $q isa person, has ref 0; $q has $age, has $name; };
+    insert try { isset $age, $name; $q isa person, has ref 0; $q has $age, has $name; };
     """
     Then uniquely identify answer concepts
       | p         | q         | age         | name           |
@@ -2862,7 +2862,7 @@ Parker";
     insert
       $john isa person, has ref 0, has name "John";
     """
-    Then typeql write query; fails with a message containing: "A write stage uses the optional variable 'age' outside a 'try' block."
+    Then typeql write query; fails with a message containing: "The optional variable 'age' was used in a context where it may fail the branch if unset. Please acknowledge the optionality"
     """
     match
       $p isa person;
